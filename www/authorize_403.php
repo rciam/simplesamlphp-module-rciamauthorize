@@ -13,9 +13,14 @@ $state = SimpleSAML_Auth_State::loadState($_REQUEST['StateId'], 'rciamauthorize:
 $globalConfig = SimpleSAML_Configuration::getInstance();
 $t = new SimpleSAML_XHTML_Template($globalConfig, 'rciamauthorize:authorize_403.php');
 if (isset($state['Source']['auth'])) {
+    $authSource = $state['Source']['auth'];
+} else if (isset($state['SimpleSAML_Auth_Source.id'])) {
+    $authSource = $state['SimpleSAML_Auth_Source.id'];
+}
+if (isset($authSource)) {
     $t->data['logoutURL'] = SimpleSAML_Module::getModuleURL(
         'core/authenticate.php',
-        array('as' => $state['Source']['auth'])
+        array('as' => $authSource)
     )."&logout";
 }
 if (isset($state['authprocAuthorize_reject_msg'])) {
