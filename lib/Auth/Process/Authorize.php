@@ -31,6 +31,13 @@ class sspmod_rciamauthorize_Auth_Process_Authorize extends SimpleSAML_Auth_Proce
     protected $reject_msg = array();
 
     /**
+     * Logo URL
+     *
+     * @var string
+     */
+    protected $logoURL = null;
+
+    /**
      * Array of valid users. Each element is a regular expression. You should
      * user \ to escape special chars, like '.' etc.
      *
@@ -71,6 +78,13 @@ class sspmod_rciamauthorize_Auth_Process_Authorize extends SimpleSAML_Auth_Proce
             unset($config['reject_msg']);
         }
 
+        // Check for the logo_url option, get it and remove it
+        // Must be a string
+        if (isset($config['logo_url']) && is_string($config['logo_url'])) {
+            $this->logoURL = $config['logo_url'];
+            unset($config['logo_url']);
+        }
+
         foreach ($config as $attribute => $values) {
             if (is_string($values)) {
                 $values = array($values);
@@ -104,10 +118,6 @@ class sspmod_rciamauthorize_Auth_Process_Authorize extends SimpleSAML_Auth_Proce
         assert('array_key_exists("Attributes", $request)');
 
         $attributes = &$request['Attributes'];
-        // Store the rejection message array in the $request
-        if(!empty($this->reject_msg)) {
-            $request['authprocAuthorize_reject_msg'] = $this->reject_msg;
-        }
 
         foreach ($this->valid_attribute_values as $name => $patterns) {
             if (array_key_exists($name, $attributes)) {
@@ -131,6 +141,14 @@ class sspmod_rciamauthorize_Auth_Process_Authorize extends SimpleSAML_Auth_Proce
             }
         }
         if (!$authorize) {
+            // Store the rejection message array in the $request
+            if(!empty($this->reject_msg)) {
+                $request['authprocAuthorize_reject_msg'] = $this->reject_msg;
+            }
+            // Store the logo URL in the $request
+            if(!empty($this->logoURL)) {
+                $request['authprocAuthorize_logo_url'] = $this->logoURL;
+            }
             $this->unauthorized($request);
         }
     }

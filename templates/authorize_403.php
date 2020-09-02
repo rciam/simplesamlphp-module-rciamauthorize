@@ -21,7 +21,12 @@ if (array_key_exists('reject_msg', $this->data)) {
 $this->includeAtTemplateBase('includes/header.php');
 
 echo '<h1>'.$this->data['403_header'].'</h1>';
-echo '<p>'.$this->data['403_text'].'</p>';
+echo '<table><tr>';
+if (isset($this->data['logoURL'])) {
+    echo '<td><img src="'.$this->data['logoURL'].'" style="height: 90px; margin: 15px" alt="" /></td>';
+}
+echo '<td>'.$this->data['403_text'].'</td>';
+echo '</tr></table>';
 if (isset($this->data['logoutURL'])) {
     echo '<p><a href="'.htmlspecialchars($this->data['logoutURL']).'">'.$this->t('{status:logout}').'</a></p>';
 }

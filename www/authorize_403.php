@@ -26,5 +26,8 @@ if (isset($authSource)) {
 if (isset($state['authprocAuthorize_reject_msg'])) {
     $t->data['reject_msg'] = $state['authprocAuthorize_reject_msg'];
 }
+if (isset($state['authprocAuthorize_logo_url'])) {
+    $t->data['logoURL'] = $state['authprocAuthorize_logo_url'];
+}
 header('HTTP/1.0 403 Forbidden');
 $t->show();
