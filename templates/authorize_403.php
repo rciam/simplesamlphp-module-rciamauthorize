@@ -13,6 +13,8 @@
 $this->data['403_header'] = $this->t('{rciamauthorize:Authorize:403_header}');
 $this->data['403_text'] = $this->t('{rciamauthorize:Authorize:403_text}');
 
+$this->data['jquery'] = array('core' => true);
+
 if (array_key_exists('reject_msg', $this->data)) {
     if(isset($this->data['reject_msg'][$this->getLanguage()])) {
         $this->data['403_text'] = $this->data['reject_msg'][$this->getLanguage()];
