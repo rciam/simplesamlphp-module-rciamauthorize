@@ -2,6 +2,11 @@
 
 namespace SimpleSAML\Module\rciamauthorize\Auth\Process;
 
+use SimpleSAML\Auth\ProcessingFilter;
+use SimpleSAML\Auth\State;
+use SimpleSAML\Module;
+use SimpleSAML\Utils\HTTP;
+
 /**
  * Filter to authorize only certain users.
  * See docs directory.
@@ -9,7 +14,8 @@ namespace SimpleSAML\Module\rciamauthorize\Auth\Process;
  * @author Ernesto Revilla, Yaco Sistemas SL., Ryan Panning
  * @package SimpleSAMLphp
  */
-class Authorize extends \SimpleSAML\Auth\ProcessingFilter {
+class Authorize extends ProcessingFilter
+{
 
     /**
      * Flag to deny/unauthorize the user a attribute filter IS found
@@ -93,14 +99,15 @@ class Authorize extends \SimpleSAML\Auth\ProcessingFilter {
             }
             if (!is_array($values)) {
                 throw new Exception(
-                    'Filter Authorize: Attribute values is neither string nor array: '.var_export($attribute, true)
+                    'Filter Authorize: Attribute values is neither string nor array: ' . var_export($attribute, true)
                 );
             }
             foreach ($values as $value) {
                 if (!is_string($value)) {
                     throw new Exception(
-                        'Filter Authorize: Each value should be a string for attribute: '.var_export($attribute, true).
-                            ' value: '.var_export($value, true).' Config is: '.var_export($config, true)
+                        'Filter Authorize: Each value should be a string for attribute: '
+                        . var_export($attribute, true) . ' value: ' . var_export($value, true)
+                        . ' Config is: ' . var_export($config, true)
                     );
                 }
             }
@@ -144,11 +151,11 @@ class Authorize extends \SimpleSAML\Auth\ProcessingFilter {
         }
         if (!$authorize) {
             // Store the rejection message array in the $request
-            if(!empty($this->rejectMsg)) {
+            if (!empty($this->rejectMsg)) {
                 $request['authprocAuthorize_reject_msg'] = $this->rejectMsg;
             }
             // Store the logo URL in the $request
-            if(!empty($this->logoUrl)) {
+            if (!empty($this->logoUrl)) {
                 $request['authprocAuthorize_logo_url'] = $this->logoUrl;
             }
             $this->unauthorized($request);
@@ -170,10 +177,8 @@ class Authorize extends \SimpleSAML\Auth\ProcessingFilter {
     protected function unauthorized(&$request)
     {
         // Save state and redirect to 403 page
-        $id = SimpleSAML\Auth\State::saveState($request,
-            'rciamauthorize:Authorize');
-        $url = SimpleSAML\Module::getModuleURL(
-            'rciamauthorize/authorize_403.php');
-        \SimpleSAML\Utils\HTTP::redirectTrustedURL($url, array('StateId' => $id));
+        $id = State::saveState($request, 'rciamauthorize:Authorize');
+        $url = Module::getModuleURL('rciamauthorize/authorize_403.php');
+        HTTP::redirectTrustedURL($url, array('StateId' => $id));
     }
 }
