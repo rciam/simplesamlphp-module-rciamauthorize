@@ -6,19 +6,19 @@
  */
 
 if (!array_key_exists('StateId', $_REQUEST)) {
-    throw new SimpleSAML_Error_BadRequest('Missing required StateId query parameter.');
+    throw new SimpleSAML\Module\rciamauthorize\Auth\Process\AuthorizeError\BadRequest('Missing required StateId query parameter.');
 }
-$state = SimpleSAML_Auth_State::loadState($_REQUEST['StateId'], 'rciamauthorize:Authorize');
+$state = SimpleSAML\Auth\State::loadState($_REQUEST['StateId'], 'rciamauthorize:Authorize');
 
-$globalConfig = SimpleSAML_Configuration::getInstance();
-$t = new SimpleSAML_XHTML_Template($globalConfig, 'rciamauthorize:authorize_403.php');
+$globalConfig = SimpleSAML\Configuration::getInstance();
+$t = new SimpleSAML\XHTML\Template($globalConfig, 'rciamauthorize:authorize_403.php');
 if (isset($state['Source']['auth'])) {
     $authSource = $state['Source']['auth'];
 } else if (isset($state['SimpleSAML_Auth_Source.id'])) {
     $authSource = $state['SimpleSAML_Auth_Source.id'];
 }
 if (isset($authSource)) {
-    $t->data['logoutURL'] = SimpleSAML_Module::getModuleURL(
+    $t->data['logoutURL'] = SimpleSAML\Module::getModuleURL(
         'core/authenticate.php',
         array('as' => $authSource)
     )."&logout";

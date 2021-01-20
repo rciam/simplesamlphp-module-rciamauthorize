@@ -1,5 +1,7 @@
 <?php
 
+namespace SimpleSAML\Module\rciamauthorize\Auth\Process;
+
 /**
  * Filter to authorize only certain users.
  * See docs directory.
@@ -7,7 +9,7 @@
  * @author Ernesto Revilla, Yaco Sistemas SL., Ryan Panning
  * @package SimpleSAMLphp
  */
-class sspmod_rciamauthorize_Auth_Process_Authorize extends SimpleSAML_Auth_ProcessingFilter {
+class Authorize extends \SimpleSAML\Auth\ProcessingFilter {
 
     /**
      * Flag to deny/unauthorize the user a attribute filter IS found
@@ -168,9 +170,9 @@ class sspmod_rciamauthorize_Auth_Process_Authorize extends SimpleSAML_Auth_Proce
     protected function unauthorized(&$request)
     {
         // Save state and redirect to 403 page
-        $id = SimpleSAML_Auth_State::saveState($request,
+        $id = SimpleSAML\Auth\State::saveState($request,
             'rciamauthorize:Authorize');
-        $url = SimpleSAML_Module::getModuleURL(
+        $url = SimpleSAML\Module::getModuleURL(
             'rciamauthorize/authorize_403.php');
         \SimpleSAML\Utils\HTTP::redirectTrustedURL($url, array('StateId' => $id));
     }
