@@ -28,7 +28,7 @@ if (isset($state['Source']['auth'])) {
 if (isset($authSource)) {
     $t->data['logoutUrl'] = Module::getModuleURL(
         'core/authenticate.php',
-        array('as' => $authSource)
+        ['as' => $authSource]
     ) . "&logout";
 }
 if (isset($state['authprocAuthorize_reject_msg'])) {

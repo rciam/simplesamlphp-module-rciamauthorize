@@ -36,7 +36,7 @@ class Authorize extends ProcessingFilter
      *
      * @var array
      */
-    protected $rejectMsg = array();
+    protected $rejectMsg = [];
 
     /**
      * Logo URL
@@ -50,7 +50,7 @@ class Authorize extends ProcessingFilter
      * user \ to escape special chars, like '.' etc.
      *
      */
-    protected $validAttributeValues = array();
+    protected $validAttributeValues = [];
 
     /**
      * Initialize this filter.
@@ -95,7 +95,7 @@ class Authorize extends ProcessingFilter
 
         foreach ($config as $attribute => $values) {
             if (is_string($values)) {
-                $values = array($values);
+                $values = [$values];
             }
             if (!is_array($values)) {
                 throw new Exception(
@@ -133,7 +133,7 @@ class Authorize extends ProcessingFilter
                 foreach ($patterns as $pattern) {
                     $values = $attributes[$name];
                     if (!is_array($values)) {
-                        $values = array($values);
+                        $values = [$values];
                     }
                     foreach ($values as $value) {
                         if ($this->regex) {
@@ -179,6 +179,6 @@ class Authorize extends ProcessingFilter
         // Save state and redirect to 403 page
         $id = State::saveState($request, 'rciamauthorize:Authorize');
         $url = Module::getModuleURL('rciamauthorize/authorize_403.php');
-        HTTP::redirectTrustedURL($url, array('StateId' => $id));
+        HTTP::redirectTrustedURL($url, ['StateId' => $id]);
     }
 }

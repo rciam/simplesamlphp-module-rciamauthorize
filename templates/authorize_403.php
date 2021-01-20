@@ -13,7 +13,7 @@
 $this->data['403_header'] = $this->t('{rciamauthorize:Authorize:403_header}');
 $this->data['403_text'] = $this->t('{rciamauthorize:Authorize:403_text}');
 
-$this->data['jquery'] = array('core' => true);
+$this->data['jquery'] = ['core' => true];
 
 // Check if custom reject message is present:
 // 1. Get message translation in current language;
