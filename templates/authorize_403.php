@@ -19,13 +19,13 @@ $this->data['jquery'] = array('core' => true);
 // 1. Get message translation in current language;
 // 2. otherwise check for translation in default language from configuration;
 // 3. last resort, get first available translation
-if (array_key_exists('reject_msg', $this->data)) {
-    if(isset($this->data['reject_msg'][$this->getLanguage()])) {
-        $this->data['403_text'] = $this->data['reject_msg'][$this->getLanguage()];
-    } else if (isset($this->data['reject_msg'][$this->getDefaultLanguage()])) {
-        $this->data['403_text'] = $this->data['reject_msg']['en'];
+if (array_key_exists('rejectMsg', $this->data)) {
+    if(isset($this->data['rejectMsg'][$this->getLanguage()])) {
+        $this->data['403_text'] = $this->data['rejectMsg'][$this->getLanguage()];
+    } else if (isset($this->data['rejectMsg'][$this->getDefaultLanguage()])) {
+        $this->data['403_text'] = $this->data['rejectMsg']['en'];
     } else {
-        $this->data['403_text'] = reset($this->data['reject_msg']);
+        $this->data['403_text'] = reset($this->data['rejectMsg']);
     }
 }
 $this->includeAtTemplateBase('includes/header.php');

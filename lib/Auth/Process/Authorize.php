@@ -30,21 +30,21 @@ class Authorize extends \SimpleSAML\Auth\ProcessingFilter {
      *
      * @var array
      */
-    protected $reject_msg = array();
+    protected $rejectMsg = array();
 
     /**
      * Logo URL
      *
      * @var string
      */
-    protected $logoURL = null;
+    protected $logoUrl = null;
 
     /**
      * Array of valid users. Each element is a regular expression. You should
      * user \ to escape special chars, like '.' etc.
      *
      */
-    protected $valid_attribute_values = array();
+    protected $validAttributeValues = array();
 
     /**
      * Initialize this filter.
@@ -73,17 +73,17 @@ class Authorize extends \SimpleSAML\Auth\ProcessingFilter {
             unset($config['regex']);
         }
 
-        // Check for the reject_msg option, get it and remove it
+        // Check for the rejectMsg option, get it and remove it
         // Must be array of languages
-        if (isset($config['reject_msg']) && is_array($config['reject_msg'])) {
-            $this->reject_msg = $config['reject_msg'];
-            unset($config['reject_msg']);
+        if (isset($config['rejectMsg']) && is_array($config['rejectMsg'])) {
+            $this->rejectMsg = $config['rejectMsg'];
+            unset($config['rejectMsg']);
         }
 
         // Check for the logo_url option, get it and remove it
         // Must be a string
         if (isset($config['logo_url']) && is_string($config['logo_url'])) {
-            $this->logoURL = $config['logo_url'];
+            $this->logoUrl = $config['logo_url'];
             unset($config['logo_url']);
         }
 
@@ -104,7 +104,7 @@ class Authorize extends \SimpleSAML\Auth\ProcessingFilter {
                     );
                 }
             }
-            $this->valid_attribute_values[$attribute] = $values;
+            $this->validAttributeValues[$attribute] = $values;
         }
     }
 
@@ -121,7 +121,7 @@ class Authorize extends \SimpleSAML\Auth\ProcessingFilter {
 
         $attributes = &$request['Attributes'];
 
-        foreach ($this->valid_attribute_values as $name => $patterns) {
+        foreach ($this->validAttributeValues as $name => $patterns) {
             if (array_key_exists($name, $attributes)) {
                 foreach ($patterns as $pattern) {
                     $values = $attributes[$name];
@@ -144,12 +144,12 @@ class Authorize extends \SimpleSAML\Auth\ProcessingFilter {
         }
         if (!$authorize) {
             // Store the rejection message array in the $request
-            if(!empty($this->reject_msg)) {
-                $request['authprocAuthorize_reject_msg'] = $this->reject_msg;
+            if(!empty($this->rejectMsg)) {
+                $request['authprocAuthorize_reject_msg'] = $this->rejectMsg;
             }
             // Store the logo URL in the $request
-            if(!empty($this->logoURL)) {
-                $request['authprocAuthorize_logo_url'] = $this->logoURL;
+            if(!empty($this->logoUrl)) {
+                $request['authprocAuthorize_logo_url'] = $this->logoUrl;
             }
             $this->unauthorized($request);
         }

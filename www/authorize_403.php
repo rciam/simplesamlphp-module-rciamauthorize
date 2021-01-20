@@ -24,7 +24,7 @@ if (isset($authSource)) {
     )."&logout";
 }
 if (isset($state['authprocAuthorize_reject_msg'])) {
-    $t->data['reject_msg'] = $state['authprocAuthorize_reject_msg'];
+    $t->data['rejectMsg'] = $state['authprocAuthorize_reject_msg'];
 }
 if (isset($state['authprocAuthorize_logo_url'])) {
     $t->data['logoURL'] = $state['authprocAuthorize_logo_url'];

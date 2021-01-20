@@ -12,6 +12,7 @@ This version is compatible with [SimpleSAMLphp v1.17](https://simplesamlphp.org/
 ### Changed
 
 - Comply to [PSR-4: Autoloader](https://www.php-fig.org/psr/psr-4/) guidelines
+- Comply to [PSR-1: Basic Coding Standard](https://www.php-fig.org/psr/psr-1/) guidelines
 
 ## [v1.0.0] - 2021-03-01
 
