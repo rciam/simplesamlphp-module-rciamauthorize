@@ -1,5 +1,12 @@
 <?php
 
+namespace SimpleSAML\Module\rciamauthorize\Auth\Process;
+
+use SimpleSAML\Auth\ProcessingFilter;
+use SimpleSAML\Auth\State;
+use SimpleSAML\Module;
+use SimpleSAML\Utils\HTTP;
+
 /**
  * Filter to authorize only certain users.
  * See docs directory.
@@ -7,7 +14,8 @@
  * @author Ernesto Revilla, Yaco Sistemas SL., Ryan Panning
  * @package SimpleSAMLphp
  */
-class sspmod_rciamauthorize_Auth_Process_Authorize extends SimpleSAML_Auth_ProcessingFilter {
+class Authorize extends ProcessingFilter
+{
 
     /**
      * Flag to deny/unauthorize the user a attribute filter IS found
@@ -28,21 +36,21 @@ class sspmod_rciamauthorize_Auth_Process_Authorize extends SimpleSAML_Auth_Proce
      *
      * @var array
      */
-    protected $reject_msg = array();
+    protected $rejectMsg = [];
 
     /**
      * Logo URL
      *
      * @var string
      */
-    protected $logoURL = null;
+    protected $logoUrl = null;
 
     /**
      * Array of valid users. Each element is a regular expression. You should
      * user \ to escape special chars, like '.' etc.
      *
      */
-    protected $valid_attribute_values = array();
+    protected $validAttributeValues = [];
 
     /**
      * Initialize this filter.
@@ -71,38 +79,39 @@ class sspmod_rciamauthorize_Auth_Process_Authorize extends SimpleSAML_Auth_Proce
             unset($config['regex']);
         }
 
-        // Check for the reject_msg option, get it and remove it
+        // Check for the rejectMsg option, get it and remove it
         // Must be array of languages
-        if (isset($config['reject_msg']) && is_array($config['reject_msg'])) {
-            $this->reject_msg = $config['reject_msg'];
-            unset($config['reject_msg']);
+        if (isset($config['rejectMsg']) && is_array($config['rejectMsg'])) {
+            $this->rejectMsg = $config['rejectMsg'];
+            unset($config['rejectMsg']);
         }
 
         // Check for the logo_url option, get it and remove it
         // Must be a string
         if (isset($config['logo_url']) && is_string($config['logo_url'])) {
-            $this->logoURL = $config['logo_url'];
+            $this->logoUrl = $config['logo_url'];
             unset($config['logo_url']);
         }
 
         foreach ($config as $attribute => $values) {
             if (is_string($values)) {
-                $values = array($values);
+                $values = [$values];
             }
             if (!is_array($values)) {
                 throw new Exception(
-                    'Filter Authorize: Attribute values is neither string nor array: '.var_export($attribute, true)
+                    'Filter Authorize: Attribute values is neither string nor array: ' . var_export($attribute, true)
                 );
             }
             foreach ($values as $value) {
                 if (!is_string($value)) {
                     throw new Exception(
-                        'Filter Authorize: Each value should be a string for attribute: '.var_export($attribute, true).
-                            ' value: '.var_export($value, true).' Config is: '.var_export($config, true)
+                        'Filter Authorize: Each value should be a string for attribute: '
+                        . var_export($attribute, true) . ' value: ' . var_export($value, true)
+                        . ' Config is: ' . var_export($config, true)
                     );
                 }
             }
-            $this->valid_attribute_values[$attribute] = $values;
+            $this->validAttributeValues[$attribute] = $values;
         }
     }
 
@@ -119,12 +128,12 @@ class sspmod_rciamauthorize_Auth_Process_Authorize extends SimpleSAML_Auth_Proce
 
         $attributes = &$request['Attributes'];
 
-        foreach ($this->valid_attribute_values as $name => $patterns) {
+        foreach ($this->validAttributeValues as $name => $patterns) {
             if (array_key_exists($name, $attributes)) {
                 foreach ($patterns as $pattern) {
                     $values = $attributes[$name];
                     if (!is_array($values)) {
-                        $values = array($values);
+                        $values = [$values];
                     }
                     foreach ($values as $value) {
                         if ($this->regex) {
@@ -142,12 +151,12 @@ class sspmod_rciamauthorize_Auth_Process_Authorize extends SimpleSAML_Auth_Proce
         }
         if (!$authorize) {
             // Store the rejection message array in the $request
-            if(!empty($this->reject_msg)) {
-                $request['authprocAuthorize_reject_msg'] = $this->reject_msg;
+            if (!empty($this->rejectMsg)) {
+                $request['authprocAuthorize_reject_msg'] = $this->rejectMsg;
             }
             // Store the logo URL in the $request
-            if(!empty($this->logoURL)) {
-                $request['authprocAuthorize_logo_url'] = $this->logoURL;
+            if (!empty($this->logoUrl)) {
+                $request['authprocAuthorize_logo_url'] = $this->logoUrl;
             }
             $this->unauthorized($request);
         }
@@ -168,10 +177,8 @@ class sspmod_rciamauthorize_Auth_Process_Authorize extends SimpleSAML_Auth_Proce
     protected function unauthorized(&$request)
     {
         // Save state and redirect to 403 page
-        $id = SimpleSAML_Auth_State::saveState($request,
-            'rciamauthorize:Authorize');
-        $url = SimpleSAML_Module::getModuleURL(
-            'rciamauthorize/authorize_403.php');
-        \SimpleSAML\Utils\HTTP::redirectTrustedURL($url, array('StateId' => $id));
+        $id = State::saveState($request, 'rciamauthorize:Authorize');
+        $url = Module::getModuleURL('rciamauthorize/authorize_403.php');
+        HTTP::redirectTrustedURL($url, ['StateId' => $id]);
     }
 }
