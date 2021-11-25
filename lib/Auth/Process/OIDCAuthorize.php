@@ -7,6 +7,7 @@ use SimpleSAML\Auth\State;
 use SimpleSAML\Module;
 use SimpleSAML\Utils\HTTP;
 use SimpleSAML\Logger;
+use SimpleSAML\Error;
 
 /**
  * Filter to authorize only certain users.
@@ -53,11 +54,6 @@ class OIDCAuthorize extends ProcessingFilter
    */
   protected $validAttributeValues = [];
 
-  /**
-   *  Oidc issuer
-   */
-
-  protected $oidcIssuer;
 
   /**
    * Initialize this filter.
@@ -71,12 +67,6 @@ class OIDCAuthorize extends ProcessingFilter
     parent::__construct($config, $reserved);
 
     assert('is_array($config)');
-    if (!empty($config['oidc_issuer'])) {
-      $this->oidcIssuer = $config['oidc_issuer'];
-      unset($config['oidc_issuer']);
-    } else {
-      throw new Exception('OIDC Authorize: oidc issuer cannot be empty.');
-    }
 
     foreach ($config['clients'] as $client_id => $client_config) {
       // Check for the deny option, get it and remove it
@@ -139,13 +129,13 @@ class OIDCAuthorize extends ProcessingFilter
   public function process(&$request)
   {
     assert('is_array($request)');
-    assert('array_key_exists("saml:RequesterID", $request)');
 
-    if (empty($request['saml:RequesterID'][0])) {
-      Logger::debug("[rciamauthorize:OIDCAuthorize] Ignoring request with missing saml:RequesterdID");
-      return;
+    $client_id = $request['saml:RelayState'] ?? null;
+    if (empty($client_id)) {
+        throw new Error\Error(
+            ['UNHANDLEDEXCEPTION', 'Request missing saml:RelayState']
+        );
     }
-    $client_id = str_replace($this->oidcIssuer, "", $request['saml:RequesterID'][0]);
 
     // Check if client_id exists in module configuration
     if (array_key_exists($client_id, $this->validAttributeValues)) {
