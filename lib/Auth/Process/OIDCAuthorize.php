@@ -54,6 +54,11 @@ class OIDCAuthorize extends ProcessingFilter
    */
   protected $validAttributeValues = [];
 
+  /**
+   *  Oidc issuer
+   */
+
+  protected $oidcIssuer;
 
   /**
    * Initialize this filter.
@@ -67,6 +72,12 @@ class OIDCAuthorize extends ProcessingFilter
     parent::__construct($config, $reserved);
 
     assert('is_array($config)');
+    if (!empty($config['oidc_issuer'])) {
+      $this->oidcIssuer = $config['oidc_issuer'];
+      unset($config['oidc_issuer']);
+    } else {
+      throw new Exception('OIDC Authorize: oidc issuer cannot be empty.');
+    }
 
     foreach ($config['clients'] as $client_id => $client_config) {
       // Check for the deny option, get it and remove it
@@ -130,8 +141,11 @@ class OIDCAuthorize extends ProcessingFilter
   {
     assert('is_array($request)');
 
-    $client_id = $request['saml:RelayState'] ?? null;
-    if (empty($client_id)) {
+    if (!empty($request['saml:RequesterID'][0])) {
+        $client_id = str_replace($this->oidcIssuer, "", $request['saml:RequesterID'][0]);
+    } elseif(!empty($request['saml:RelayState'])) {
+        $client_id = $request['saml:RelayState'];
+    } else {
         throw new Error\Error(
             ['UNHANDLEDEXCEPTION', 'Request missing saml:RelayState']
         );
