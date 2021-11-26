@@ -165,7 +165,7 @@ class OIDCAuthorize extends ProcessingFilter
       }
 
       if (!$authorize) {
-        Logger::info("[rciamauthorize:OIDCAuthorize] Rejecting Authorize for " . $client_id);
+        Logger::info("[rciamauthorize:OIDCAuthorize] Access to client " . $client_id . " forbidden");
         // Store the rejection message array in the $request
         if (!empty($this->rejectMsg[$client_id])) {
           $request['authprocAuthorize_reject_msg'] = $this->rejectMsg[$client_id];
