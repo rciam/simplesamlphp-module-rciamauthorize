@@ -4,6 +4,7 @@ namespace SimpleSAML\Module\rciamauthorize\Auth\Process;
 
 use SimpleSAML\Auth\ProcessingFilter;
 use SimpleSAML\Auth\State;
+use SimpleSAML\Logger;
 use SimpleSAML\Module;
 use SimpleSAML\Utils\HTTP;
 
@@ -150,6 +151,7 @@ class Authorize extends ProcessingFilter
             }
         }
         if (!$authorize) {
+            Logger::info("[rciamauthorize:Authorize] Access forbidden");
             // Store the rejection message array in the $request
             if (!empty($this->rejectMsg)) {
                 $request['authprocAuthorize_reject_msg'] = $this->rejectMsg;
