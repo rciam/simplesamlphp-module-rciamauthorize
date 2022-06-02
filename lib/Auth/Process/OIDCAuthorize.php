@@ -54,6 +54,10 @@ class OIDCAuthorize extends ProcessingFilter
    */
   protected $validAttributeValues = [];
 
+  /**
+   *  Keycloak Sp
+   */
+  protected $keycloakSp;
 
   /**
    * Initialize this filter.
@@ -67,6 +71,16 @@ class OIDCAuthorize extends ProcessingFilter
     parent::__construct($config, $reserved);
 
     assert('is_array($config)');
+
+    if (array_key_exists('keycloakSp', $config)) {
+      if (!is_string($config['keycloakSp'])) {
+        Logger::error(
+          "[OIDCAuthorize] Configuration error: 'keycloakSp' not an string");
+        throw new \Exception(
+          "[OIDCAuthorize] configuration error: 'keycloakSp' not an string");
+      }
+      $this->keycloakSp = $config['keycloakSp'];
+    }
 
     foreach ($config['clients'] as $client_id => $client_config) {
       // Check for the deny option, get it and remove it
@@ -87,15 +101,15 @@ class OIDCAuthorize extends ProcessingFilter
 
       // Check for the rejectMsg option, get it and remove it
       // Must be array of languages
-      if (isset($client_config['reject_msg']) && is_array($client_config['reject_msg'])) {
-        $this->rejectMsg[$client_id] = $client_config['reject_msg'];
-        unset($client_config['reject_msg']);
+      if (isset($client_config['rejectMsg']) && is_array($client_config['rejectMsg'])) {
+        $this->rejectMsg[$client_id] = $client_config['rejectMsg'];
+        unset($client_config['rejectMsg']);
       }
-      // Check for the logo_url option, get it and remove it
+      // Check for the logoUrl option, get it and remove it
       // Must be a string
-      if (isset($client_config['logo_url']) && is_string($client_config['logo_url'])) {
-        $this->logoUrl = $client_config['logo_url'];
-        unset($client_config['logo_url']);
+      if (isset($client_config['logoUrl']) && is_string($client_config['logoUrl'])) {
+        $this->logoUrl = $client_config['logoUrl'];
+        unset($client_config['logoUrl']);
       }
 
       foreach ($client_config as $attribute => $values) {
@@ -130,13 +144,26 @@ class OIDCAuthorize extends ProcessingFilter
   {
     assert('is_array($request)');
 
-    $client_id = $request['saml:RelayState'] ?? null;
-    if (empty($client_id)) {
-        throw new Error\Error(
-            ['UNHANDLEDEXCEPTION', 'Request missing saml:RelayState']
-        );
-    }
+    $client_id = null;
 
+    if (!empty($request['saml:RelayState']) 
+      && !empty($this->keycloakSp) 
+      && $request['Destination']['entityid'] == 
+                $this->keycloakSp) {
+      $client_id = explode('.', $request['saml:RelayState'], 3)[2];
+      if(empty($client_id)) {
+        throw new Error\Error(
+            ['UNHANDLEDEXCEPTION', 'Could not extract client ID from saml:RelayState']
+        );  
+      }
+    } else if(!empty($request['saml:RelayState'])) {
+      $client_id = $request['saml:RelayState'];
+    } else {
+      throw new Error\Error(
+          ['UNHANDLEDEXCEPTION', 'Request missing saml:RelayState']
+      );
+    }
+    
     // Check if client_id exists in module configuration
     if (array_key_exists($client_id, $this->validAttributeValues)) {
       $authorize = $this->deny[$client_id];

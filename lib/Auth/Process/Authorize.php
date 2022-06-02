@@ -87,11 +87,11 @@ class Authorize extends ProcessingFilter
             unset($config['rejectMsg']);
         }
 
-        // Check for the logo_url option, get it and remove it
+        // Check for the logoUrl option, get it and remove it
         // Must be a string
-        if (isset($config['logo_url']) && is_string($config['logo_url'])) {
-            $this->logoUrl = $config['logo_url'];
-            unset($config['logo_url']);
+        if (isset($config['logoUrl']) && is_string($config['logoUrl'])) {
+            $this->logoUrl = $config['logoUrl'];
+            unset($config['logoUrl']);
         }
 
         foreach ($config as $attribute => $values) {
